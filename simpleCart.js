@@ -1192,8 +1192,88 @@
 						, method	: method
 						, data		: data
 					};
-				}
+				},
 
+
+				BitPay: function (opts) {
+				        console.log(opts);
+					// account email is required
+					if (!opts.api_key) {
+						return simpleCart.error("No API key is provided for BitPay.");
+					}
+
+					// build basic form options
+					var data = {
+							  cmd			: "_cart"
+							, upload		: "1"
+							, currency              : simpleCart.currency().code
+							, tax_cart		: (simpleCart.tax()*1).toFixed(2)
+							, handling_cart : (simpleCart.shipping()*1).toFixed(2)
+							, charset		: "utf-8"
+                                                        , price                 : simpleCart.grandTotal()
+						},
+						action = "https://"+opts.api_key+":@bitpay.com/api/invoice",
+						method = "POST";
+
+
+					// check for return and success URLs in the options
+					if (opts.success) {
+						data['return'] = opts.success;
+					}
+					if (opts.cancel) {
+						data.cancel_return = opts.cancel;
+					}
+					if (opts.notify) {
+						data.notify_url = opts.notify;
+					}
+
+
+					// // add all the items to the form data
+					// simpleCart.each(function (item,x) {
+					// 	var counter = x+1,
+					// 		item_options = item.options(),
+					// 		optionCount = 0,
+					// 		send;
+
+					// 	// basic item data
+					// 	data["item_name_" + counter] = item.get("name");
+					// 	data["quantity_" + counter] = item.quantity();
+					// 	data["amount_" + counter] = (item.price()*1).toFixed(2);
+					// 	data["item_number_" + counter] = item.get("item_number") || counter;
+
+
+					// 	// add the options
+					// 	simpleCart.each(item_options, function (val,k,attr) {
+					// 		// paypal limits us to 10 options
+					// 		if (k < 10) {
+
+					// 			// check to see if we need to exclude this from checkout
+					// 			send = true;
+					// 			simpleCart.each(settings.excludeFromCheckout, function (field_name) {
+					// 				if (field_name === attr) { send = false; }
+					// 			});
+					// 			if (send) {
+					// 					optionCount += 1;
+					// 					data["on" + k + "_" + counter] = attr;
+					// 					data["os" + k + "_" + counter] = val;
+					// 			}
+
+					// 		}
+					// 	});
+
+					// 	// options count
+					// 	data["option_index_"+ x] = Math.min(10, optionCount);
+					// });
+
+
+					// return the data for the checkout form
+					return {
+						  action	: action
+						, method	: method
+						, data		: data
+					};
+
+				}
 
 			});
 
